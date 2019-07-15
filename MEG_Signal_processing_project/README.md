@@ -6,5 +6,6 @@ Magnetoencephalography (MEG) is a functional neuroimaging technique for mapping 
 
 Detection of objective neural signatures for the integration of visual information in the visual cortex of humans. 
 Studying the Interplay between gamma band harmonics in generating oscillatory inter- modulation in the visual cortex. 
-
+Allows use to anwser the question of how the brain combines information to form higher level representations that represents
+a gestalt or global understanding of sub-units of information. 
 
