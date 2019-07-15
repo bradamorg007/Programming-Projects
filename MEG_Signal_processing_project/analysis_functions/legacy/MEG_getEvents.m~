@@ -1,0 +1,74 @@
+
+function session = MEG_getEvents(session)
+
+    % find the start of each baseline trigger. Get event data 
+    cfg.dataset = session.paths.rawData;
+    cfg.trialfun = 'ft_trialfun_general';
+    cfg.trialdef.eventtype = 'STI002';
+    cfg.trialdef.eventvalue = 5;
+    cfg.trialdef.prestim = 1;
+    cfg.trialdef.poststim = 4;
+    cfg = ft_definetrial(cfg);
+    
+    
+eventData = cell(2, length(cfg.trl));
+eventIndex = [find(strcmp('STI001', {cfg.event.type}')), find(strcmp('STI003', {cfg.event.type}'))];
+
+% also ignore unwanted info STI007 and STI008 are not needed as a question
+% STI001 STI002 and STI003 are not needed all trigger codes are sent only 
+% on the baseline period. is not asked any more. Also dont need Trigger or STI101.
+for i = 1:length(eventData)  
+    
+    eventData{1, i} = [{cfg.event(eventIndex(i,1):eventIndex(i, 2)).type}', {cfg.event(eventIndex(i,1):eventIndex(i, 2)).sample}', {cfg.event(eventIndex(i,1):eventIndex(i, 2)).value}'];
+    
+    match = [0, 0, 0];
+    searchTargets = {'STI004', 'STI005', 'STI006'};
+    
+    for k = 1:length(searchTargets)
+            if ~isempty(find(strcmp(searchTargets{k}, eventData{1, i}(:, 1))))
+                match(k) = 1; 
+            end 
+    end
+    
+    if match(1) == 0
+        eventData{2, i}(1) = "[65 72Hz]";
+    else
+        eventData{2, i}(1) = "[72 65Hz]";
+    end
+    
+    if isequal(match(2:3), [0 0])
+        eventData{2, i}(2) = "[right right]";
+        eventData{2, i}(3) = "[same direction]";
+        
+    elseif isequal(match(2:3), [1, 0])
+        eventData{2, i}(2) = "[left left]";
+        eventData{2, i}(3) = "[same direction]";
+        
+    elseif isequal(match(2:3), [0, 1])
+        eventData{2, i}(2) = "[right left]";
+        eventData{2, i}(3) = "[different direction]";
+        
+    elseif isequal(match(2:3), [1, 1])
+        eventData{2, i}(2) = "[left right]";
+        eventData{2, i}(3) = "[different direction]";
+        
+    end
+    
+end 
+
+session.data.preProcessed.events = eventData;
+
+% Perform PreProcessing
+cfg.bsfilter = 'yes';  
+cfg.bsfreq = [48 52];      % Apply a 50Hz notch filter  
+cfg.lpfilter = 'yes';
+cfg.lpfreq = 80; 
+cfg.padding   = 8;          
+cfg.padtype  = 'data'; 
+cfg.channel = {'MEG'};  
+cfg.detrend = 'yes';     % Remove slow drifts 
+data_all  = ft_preprocessing(cfg);
+
+session.data.preProcessed.data = data_all;
+
+end 
