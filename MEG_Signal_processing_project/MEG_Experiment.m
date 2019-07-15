@@ -1,3 +1,10 @@
+%% This MATLAB script is responsible for running the MEG experiment. 
+%% The code ensures synchronous time accurate communication with the MEG device via binary time locked trigger signals. 
+%% The code also ensures sinusoidal time locked modulation of pixel luminance values for stimuli. 
+%% This facilitates frequency tagged electrophysiological oscillations in the human visual cortex in response to 
+%% the presentation of conditional stimuli.
+
+
 %% ======================= NOTES ==========================================
 
 % TURN ON SCRIPT AND LEAVE TO WAIT
